@@ -10,8 +10,10 @@ function HomePage() {
     { id: 3, title: "Regents Park Trail", date: "27-05-2025" },
   ];
 
-  const handleSearch = () => {
+  const handleSearch = (e) => {
+    e.preventDefault();
     alert(searchQuery);
+    setSearchQuery("");
   };
 
   return (
