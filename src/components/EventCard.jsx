@@ -1,3 +1,5 @@
+import "../css/EventCard.css";
+
 function EventCard({ event }) {
   function onFavouriteClick() {
     alert("clicked");
