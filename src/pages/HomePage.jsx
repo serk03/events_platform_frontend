@@ -1,5 +1,6 @@
 import EventCard from "../components/EventCard";
 import { useState } from "react";
+import "../css/Home.css";
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
