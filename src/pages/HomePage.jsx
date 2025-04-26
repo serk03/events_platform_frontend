@@ -24,10 +24,21 @@ function HomePage() {
     loadPopularEvents();
   }, []);
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
-    alert(searchQuery);
-    setSearchQuery("");
+    if (!searchQuery.trim()) return;
+
+    try {
+      setLoading(true);
+      const results = await searchEvents(searchQuery);
+      setEvents(results);
+    } catch (error) {
+      console.error(error);
+      setError("Failed to search events");
+    } finally {
+      setLoading(false);
+      setSearchQuery("");
+    }
   };
 
   return (
