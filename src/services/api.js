@@ -1,18 +1,36 @@
-const API_KEY = "GAUTZQFKNNK7SX7DGP";
-const BASE_URL = "https://www.eventbriteapi.com/v3/";
+// services/api.js
 
-export const getPopularEvents = async () => {
-  const response = await fetch(`${BASE_URL}/events/popular?api_key=${API_KEY}`);
-  const data = await response.json();
-  return data.results;
-};
+const BASE_URL = "https://www.eventbriteapi.com/v3";
+const API_TOKEN = "XMVZJIUFYHF5THBWTPJF"; // your Private Token
 
-export const searchEvents = async (query) => {
-  const response = await fetch(
-    `${BASE_URL}/search/event?api_key=${API_KEY}&query=${encodeURIComponent(
-      query
-    )}`
+async function apiRequest(endpoint) {
+  try {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      headers: {
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("API Request Failed:", error);
+    throw error;
+  }
+}
+
+export async function getPopularEvents() {
+  const data = await apiRequest("/events/search/?sort_by=date");
+  return data.events || [];
+}
+
+export async function searchEvents(query) {
+  const data = await apiRequest(
+    `/events/search/?q=${encodeURIComponent(query)}`
   );
-  const data = await response.json();
-  return data.results;
-};
+  return data.events || [];
+}
