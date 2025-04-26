@@ -1,15 +1,28 @@
 import EventCard from "../components/EventCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { searchEvents, getPopularEvents } from "../services/api";
 import "../css/Home.css";
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [events, setEvents] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const events = [
-    { id: 1, title: "Trent Park Trail", date: "25-05-2025" },
-    { id: 2, title: "Montagu Park Trail", date: "26-05-2025" },
-    { id: 3, title: "Regents Park Trail", date: "27-05-2025" },
-  ];
+  useEffect(() => {
+    const loadPopularEvents = async () => {
+      try {
+        const popularEvents = await getPopularEvents();
+        setEvents(popularEvents);
+      } catch (error) {
+        console.log(error);
+        setError("Failed to load events");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPopularEvents();
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
