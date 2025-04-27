@@ -1,20 +1,13 @@
-// services/api.js
+// src/services/api.js
 
-const BASE_URL = "https://www.eventbriteapi.com/v3";
-const API_TOKEN = "XMVZJIUFYHF5THBWTPJF"; // your Private Token
+const BASE_URL = "http://localhost:5000/api";
 
-async function apiRequest(endpoint) {
+export async function getPopularEvents() {
   try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      headers: {
-        Authorization: `Bearer ${API_TOKEN}`,
-      },
-    });
-
+    const response = await fetch(`${BASE_URL}/events`);
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      throw new Error("Failed to fetch events");
     }
-
     const data = await response.json();
     return data;
   } catch (error) {
@@ -23,14 +16,16 @@ async function apiRequest(endpoint) {
   }
 }
 
-export async function getPopularEvents() {
-  const data = await apiRequest("/events/search/?sort_by=date");
-  return data.events || [];
-}
-
 export async function searchEvents(query) {
-  const data = await apiRequest(
-    `/events/search/?q=${encodeURIComponent(query)}`
-  );
-  return data.events || [];
+  try {
+    const response = await fetch(`${BASE_URL}/events`);
+    if (!response.ok) {
+      throw new Error("Failed to search events");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("API Request Failed:", error);
+    throw error;
+  }
 }
