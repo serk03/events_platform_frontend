@@ -1,0 +1,85 @@
+.register-page {
+  max-width: 450px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  text-align: center;
+}
+
+.register-page h2 {
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.register-form input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #2c2c2c;
+  color: white;
+}
+
+.register-form input::placeholder {
+  color: #bbb;
+}
+
+/* Buttons wrapper */
+.register-form-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+/* Main register button */
+.register-form .register-btn {
+  flex: 1;
+  padding: 0.75rem;
+  background-color: #00b894;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-form .register-btn:hover {
+  background-color: #019875;
+}
+
+/* Cancel button */
+.register-form .cancel-btn {
+  flex: 1;
+  padding: 0.75rem;
+  background-color: gray;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-form .cancel-btn:hover {
+  background-color: #555;
+}
+
+.error-message {
+  color: #ff6b6b;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.success-message {
+  color: #00b894;
+  margin-top: 1rem;
+  font-weight: bold;
+}
