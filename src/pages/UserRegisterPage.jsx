@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "../css/UserRegisterPage.css";
 
 function RegisterPage() {
@@ -63,7 +63,6 @@ function RegisterPage() {
   };
 
   const handleCancel = () => {
-    // Just clear the form (for now)
     setFormData({
       firstName: "",
       lastName: "",
@@ -132,6 +131,16 @@ function RegisterPage() {
 
       {error && <p className="error-message">{error}</p>}
       {success && <p className="success-message">{success}</p>}
+
+      {/* ✅ Navigation links at bottom */}
+      <div className="auth-links">
+        <p>
+          <Link to="/">← Back to Home</Link>
+        </p>
+        <p>
+          Already have an account? <Link to="/login">Login here</Link>
+        </p>
+      </div>
     </div>
   );
 }
