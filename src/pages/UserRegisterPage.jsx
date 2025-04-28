@@ -56,6 +56,19 @@ function RegisterPage() {
     }
   };
 
+  const handleCancel = () => {
+    // Just clear the form (for now)
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+    setError("");
+    setSuccess("");
+  };
+
   return (
     <div className="register-page">
       <h2>Register</h2>
@@ -100,8 +113,13 @@ function RegisterPage() {
           onChange={handleChange}
           required
         />
-        <button type="submit">Register</button>
-        <button type="submit">Cancel</button>
+
+        <div style={{ display: "flex", gap: "10px", marginTop: "1rem" }}>
+          <button type="submit">Register</button>
+          <button type="button" onClick={handleCancel}>
+            Cancel
+          </button>
+        </div>
       </form>
 
       {error && <p className="error-message">{error}</p>}
