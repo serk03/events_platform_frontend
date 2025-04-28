@@ -1,22 +1,24 @@
 .event-card {
   position: relative;
-  border-radius: 8px;
-  overflow: hidden;
   background-color: #1a1a1a;
-  transition: transform 0.2s;
-  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .event-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
 }
 
 .event-poster {
-  position: relative;
-  aspect-ratio: 2/3;
+  aspect-ratio: 16/9;
   width: 100%;
+  position: relative;
 }
 
 .event-poster img {
@@ -33,15 +35,14 @@
   bottom: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0.2),
     rgba(0, 0, 0, 0.8)
   );
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 1rem;
+  justify-content: center;
+  align-items: center;
 }
 
 .event-card:hover .event-overlay {
@@ -49,76 +50,181 @@
 }
 
 .favourite-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
   color: white;
   font-size: 1.5rem;
-  padding: 0.5rem;
-  background-color: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .favourite-btn:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.favourite-btn.active {
-  color: #ff4757;
-}
-
-.rating-select {
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .event-info {
   padding: 1rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  text-align: center;
 }
 
 .event-info h3 {
-  font-size: 1rem;
-  margin: 0;
+  margin: 0.5rem 0;
+  font-size: 1.2rem;
+  color: white;
 }
 
 .event-info p {
-  color: #999;
+  margin: 0;
   font-size: 0.9rem;
+  color: #ccc;
 }
 
-.user-rating {
-  color: #ffd700;
-  font-size: 0.9rem;
-  margin-top: auto;
+/* Signup Form */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
+.signup-form input {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Buttons inside the signup form */
+.signup-form .submit-btn {
+  padding: 0.5rem;
+  background-color: #00b894;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  flex: 1;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.signup-form .submit-btn:hover {
+  background-color: #019875;
+}
+
+.signup-form .cancel-btn {
+  padding: 0.5rem;
+  background-color: #636e72;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  flex: 1;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.signup-form .cancel-btn:hover {
+  background-color: #4b5356;
+}
+
+/* Confirmation Modal */
+.confirmation-modal {
+  background-color: white;
+  color: black;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  width: 90%;
+  max-width: 400px;
+}
+
+.confirmation-modal button {
+  margin: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.confirmation-modal button:first-child {
+  background-color: #00b894;
+  color: white;
+}
+
+.confirmation-modal button:last-child {
+  background-color: gray;
+  color: white;
+}
+
+.success-message {
+  background-color: #dfffe2;
+  color: #00b894;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  display: inline-block;
+  transition: opacity 0.5s ease;
+  opacity: 1;
+}
+
+.success-message.fade-out {
+  opacity: 0;
+}
+
+.simple-toast {
+  background-color: transparent;
+  color: #00b894;
+  font-weight: bold;
+  margin-top: 1.5rem;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+  animation: toastFade 3s forwards;
+}
+
+/* Small animation */
+@keyframes toastFade {
+  0% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+/* Event Cards Grid */
+.events-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 2rem auto 0 auto;
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
-  .movie-card {
+  .event-card {
     font-size: 0.9rem;
-  }
-
-  .event-info {
-    padding: 0.75rem;
-  }
-
-  .favourite-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 1.2rem;
   }
 }
