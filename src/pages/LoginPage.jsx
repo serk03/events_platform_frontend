@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // 🚀 for redirecting after login
+import { useNavigate } from "react-router-dom";
+import "../css/LoginPage.css";
 
 function LoginPage() {
-  const navigate = useNavigate(); // 🚀 initialize navigate
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -16,6 +19,8 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
+    setLoading(true);
 
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
@@ -30,13 +35,16 @@ function LoginPage() {
         throw new Error(data.message || "Login failed");
       }
 
-      // ✅ Save user to localStorage
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // ✅ Redirect to homepage
-      navigate("/");
+      setSuccess("Login successful! Redirecting...");
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,10 +68,13 @@ function LoginPage() {
           onChange={handleChange}
           required
         />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
 
       {error && <p className="error-message">{error}</p>}
+      {success && <p className="success-message">{success}</p>}
     </div>
   );
 }
