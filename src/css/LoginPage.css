@@ -1,5 +1,7 @@
+/* src/css/LoginPage.css */
+
 .login-page {
-  max-width: 400px;
+  max-width: 450px;
   margin: 3rem auto;
   padding: 2rem;
   background-color: #1a1a1a;
@@ -31,6 +33,7 @@
   color: #bbb;
 }
 
+/* Login Button */
 .login-form button {
   padding: 0.75rem;
   background-color: #00b894;
@@ -56,4 +59,19 @@
   color: #00b894;
   margin-top: 1rem;
   font-weight: bold;
+}
+
+.auth-links {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.auth-links a {
+  color: #00b894;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "../css/LoginPage.css";
 
 function LoginPage() {
@@ -75,6 +75,16 @@ function LoginPage() {
 
       {error && <p className="error-message">{error}</p>}
       {success && <p className="success-message">{success}</p>}
+
+      {/* ✅ Navigation Links at bottom */}
+      <div className="auth-links">
+        <p>
+          <Link to="/">← Back to Home</Link>
+        </p>
+        <p>
+          Don't have an account? <Link to="/register">Register here</Link>
+        </p>
+      </div>
     </div>
   );
 }
