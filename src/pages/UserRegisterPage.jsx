@@ -1,6 +1,6 @@
-// src/pages/RegisterPage.jsx
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../css/UserRegisterPage.css";
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -12,6 +12,8 @@ function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -43,7 +45,7 @@ function RegisterPage() {
         throw new Error(data.message || "Registration failed");
       }
 
-      setSuccess("Registration successful! You can now log in.");
+      setSuccess("Registration successful! Redirecting to login...");
       setFormData({
         firstName: "",
         lastName: "",
@@ -51,6 +53,10 @@ function RegisterPage() {
         password: "",
         confirmPassword: "",
       });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err) {
       setError(err.message);
     }
@@ -114,9 +120,11 @@ function RegisterPage() {
           required
         />
 
-        <div style={{ display: "flex", gap: "10px", marginTop: "1rem" }}>
-          <button type="submit">Register</button>
-          <button type="button" onClick={handleCancel}>
+        <div className="register-form-buttons">
+          <button type="submit" className="register-btn">
+            Register
+          </button>
+          <button type="button" className="cancel-btn" onClick={handleCancel}>
             Cancel
           </button>
         </div>
