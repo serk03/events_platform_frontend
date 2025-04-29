@@ -222,6 +222,34 @@
   margin: 2rem auto 0 auto;
 }
 
+/* Inside your EventCard.css */
+
+.edit-btn {
+  padding: 0.5rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  background-color: #2980b9;
+}
+
+.delete-btn {
+  padding: 0.5rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .event-card {
