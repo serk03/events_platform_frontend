@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import "../css/EventCard.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function EventCard({ event }) {
   const [showSignup, setShowSignup] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -13,6 +15,9 @@ function EventCard({ event }) {
   const signupFormRef = useRef(null);
   const eventCardRef = useRef(null);
   const confirmationModalRef = useRef(null);
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isStaff = user?.role === "staff";
 
   function toggleFavourite() {
     const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
@@ -57,14 +62,11 @@ function EventCard({ event }) {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/events/${event.id}/signup`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email }),
-        }
-      );
+      const response = await fetch(`${API_URL}/api/events/${event.id}/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to sign up");
@@ -77,6 +79,29 @@ function EventCard({ event }) {
       setTimeout(() => setSignupSuccess(false), 3000);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleEditEvent = () => {
+    alert(`Editing event: ${event.title}`);
+  };
+
+  const handleDeleteEvent = async () => {
+    if (window.confirm("Are you sure you want to delete this event?")) {
+      try {
+        const response = await fetch(`${API_URL}/api/events/${event.id}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to delete event");
+        }
+
+        alert("Event deleted successfully! (Reload page manually for now)");
+      } catch (error) {
+        console.error(error);
+        alert("Error deleting event.");
+      }
     }
   };
 
@@ -121,11 +146,34 @@ function EventCard({ event }) {
       <div className="event-info">
         <h3>{event.title}</h3>
         <p>{event.date}</p>
-        {!showSignup ? (
+
+        {/* Staff Only - Edit / Delete Buttons */}
+        {isStaff && (
+          <div
+            style={{
+              marginTop: "10px",
+              display: "flex",
+              gap: "10px",
+              justifyContent: "center",
+            }}
+          >
+            <button onClick={handleEditEvent} className="edit-btn">
+              Edit
+            </button>
+            <button onClick={handleDeleteEvent} className="delete-btn">
+              Delete
+            </button>
+          </div>
+        )}
+
+        {/* Normal User Signup */}
+        {!isStaff && !showSignup && (
           <button className="signup-btn" onClick={handleSignUpClick}>
             Sign Up
           </button>
-        ) : (
+        )}
+
+        {!isStaff && showSignup && (
           <form
             onSubmit={handleSignUp}
             className="signup-form"
@@ -159,12 +207,13 @@ function EventCard({ event }) {
             </div>
           </form>
         )}
+
         {signupSuccess && (
           <p className="simple-toast">✅ Successfully signed up!</p>
         )}
       </div>
 
-      {/* Confirmation Modal */}
+      {/* Confirmation Modals */}
       {showConfirmation && (
         <div className="confirmation-modal" ref={confirmationModalRef}>
           <p>Are you sure you want to sign up for this event?</p>
@@ -172,8 +221,6 @@ function EventCard({ event }) {
           <button onClick={cancelSignUp}>Cancel</button>
         </div>
       )}
-
-      {/* Cancel Confirmation Modal */}
       {showCancelConfirmation && (
         <div className="confirmation-modal">
           <p>Are you sure you want to cancel?</p>
