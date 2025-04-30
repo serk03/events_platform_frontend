@@ -1,7 +1,9 @@
 // src/components/NavBar.jsx
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import "../css/NavBar.css";
+
+const DEFAULT_AVATAR = "https://placehold.co/40x40";
 
 function NavBar() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -9,10 +11,31 @@ function NavBar() {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  const dropdownRef = useRef(null);
+  const avatarRef = useRef(null);
+
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("staffToken");
     navigate("/login");
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function onClickOutside(e) {
+      if (
+        dropdownOpen &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target) &&
+        avatarRef.current &&
+        !avatarRef.current.contains(e.target)
+      ) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [dropdownOpen]);
 
   return (
     <nav className="navbar">
@@ -39,18 +62,18 @@ function NavBar() {
           </>
         )}
 
-        {/* 🔥 Profile Avatar + Dropdown */}
         {user && (
           <div className="profile-dropdown">
             <img
-              src="https://via.placeholder.com/40" // Placeholder image
+              ref={avatarRef}
+              src={user.profilePicture || DEFAULT_AVATAR}
               alt="Profile"
               className="profile-avatar"
-              onClick={() => setDropdownOpen((prev) => !prev)}
+              onClick={() => setDropdownOpen((open) => !open)}
             />
 
             {dropdownOpen && (
-              <div className="dropdown-menu">
+              <div className="dropdown-menu" ref={dropdownRef}>
                 <Link
                   to="/profile"
                   className="dropdown-item"
