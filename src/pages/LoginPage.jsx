@@ -37,17 +37,20 @@ function LoginPage() {
         throw new Error(data.message || "Login failed");
       }
 
+      if (!data.user) {
+        throw new Error("User data not found!");
+      }
+
       localStorage.setItem("user", JSON.stringify(data.user));
 
       setSuccess("Login successful! Redirecting...");
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
+      navigate("/"); // 🚀 Redirect immediately
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Login error");
     } finally {
       setLoading(false);
     }
+    console.log("API_URL is:", API_URL);
   };
 
   return (
