@@ -1,6 +1,4 @@
-// src/services/api.js
-
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 export async function getPopularEvents() {
   try {
@@ -18,7 +16,9 @@ export async function getPopularEvents() {
 
 export async function searchEvents(query) {
   try {
-    const response = await fetch(`${BASE_URL}/events`);
+    const response = await fetch(
+      `${BASE_URL}/events?search=${encodeURIComponent(query)}`
+    );
     if (!response.ok) {
       throw new Error("Failed to search events");
     }
