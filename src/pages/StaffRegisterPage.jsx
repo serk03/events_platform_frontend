@@ -1,5 +1,3 @@
-// src/pages/StaffRegisterPage.jsx
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../css/UserRegisterPage.css";
@@ -20,10 +18,7 @@ function StaffRegisterPage() {
   const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
@@ -32,12 +27,7 @@ function StaffRegisterPage() {
     setSuccess("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    if (!formData.staffToken) {
-      setError("Staff Token is required.");
+      setError("Passwords do not match");
       return;
     }
 
@@ -46,13 +36,14 @@ function StaffRegisterPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-staff-token": formData.staffToken,
+          Authorization: formData.staffToken,
         },
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
+          confirmPassword: formData.confirmPassword,
         }),
       });
 
@@ -62,40 +53,16 @@ function StaffRegisterPage() {
         throw new Error(data.message || "Staff registration failed");
       }
 
-      setSuccess("Staff registration successful! Redirecting to login...");
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        staffToken: "",
-      });
-
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
+      setSuccess("Staff registered successfully! Redirecting to login...");
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       setError(err.message);
     }
   };
 
-  const handleCancel = () => {
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      staffToken: "",
-    });
-    setError("");
-    setSuccess("");
-  };
-
   return (
     <div className="register-page">
-      <h2>Staff Registration</h2>
+      <h2>Register New Staff</h2>
       <form onSubmit={handleSubmit} className="register-form">
         <input
           type="text"
@@ -116,7 +83,7 @@ function StaffRegisterPage() {
         <input
           type="email"
           name="email"
-          placeholder="Email Address"
+          placeholder="Email"
           value={formData.email}
           onChange={handleChange}
           required
@@ -146,14 +113,9 @@ function StaffRegisterPage() {
           required
         />
 
-        <div className="register-form-buttons">
-          <button type="submit" className="register-btn">
-            Register
-          </button>
-          <button type="button" className="cancel-btn" onClick={handleCancel}>
-            Cancel
-          </button>
-        </div>
+        <button type="submit" className="register-btn">
+          Register Staff
+        </button>
       </form>
 
       {error && <p className="error-message">{error}</p>}
@@ -164,7 +126,7 @@ function StaffRegisterPage() {
           <Link to="/">← Back to Home</Link>
         </p>
         <p>
-          Already have an account? <Link to="/login">Login here</Link>
+          Want to login instead? <Link to="/login">Login</Link>
         </p>
       </div>
     </div>
