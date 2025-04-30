@@ -3,7 +3,7 @@ import "../css/EventCard.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function EventCard({ event }) {
+function EventCard({ event, onFavouriteToggle }) {
   const [showSignup, setShowSignup] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
@@ -19,23 +19,22 @@ function EventCard({ event }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const isStaff = user?.role === "staff";
 
-  function toggleFavourite() {
+  const toggleFavourite = () => {
     const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
     let updatedFavourites;
 
     if (favourites.includes(event.id)) {
       updatedFavourites = favourites.filter((id) => id !== event.id);
+      if (onFavouriteToggle) onFavouriteToggle(event.id); // ✅ Notify parent
     } else {
       updatedFavourites = [...favourites, event.id];
     }
 
     localStorage.setItem("favourites", JSON.stringify(updatedFavourites));
-    setIsFavourite(!isFavourite);
-  }
-
-  const handleSignUpClick = () => {
-    setShowConfirmation(true);
+    setIsFavourite(updatedFavourites.includes(event.id));
   };
+
+  const handleSignUpClick = () => setShowConfirmation(true);
 
   const confirmSignUp = () => {
     setShowConfirmation(false);
@@ -56,10 +55,7 @@ function EventCard({ event }) {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-
-    if (!name.trim() || !email.trim()) {
-      return;
-    }
+    if (!name.trim() || !email.trim()) return;
 
     try {
       const response = await fetch(`${API_URL}/api/events/${event.id}/signup`, {
@@ -68,9 +64,7 @@ function EventCard({ event }) {
         body: JSON.stringify({ name, email }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to sign up");
-      }
+      if (!response.ok) throw new Error("Failed to sign up");
 
       setShowSignup(false);
       setSignupSuccess(true);
@@ -93,9 +87,7 @@ function EventCard({ event }) {
           method: "DELETE",
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to delete event");
-        }
+        if (!response.ok) throw new Error("Failed to delete event");
 
         alert("Event deleted successfully! (Reload page manually for now)");
       } catch (error) {
@@ -104,6 +96,11 @@ function EventCard({ event }) {
       }
     }
   };
+
+  useEffect(() => {
+    const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
+    setIsFavourite(favourites.includes(event.id));
+  }, [event.id]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -122,15 +119,8 @@ function EventCard({ event }) {
     }
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showSignup]);
-
-  useEffect(() => {
-    const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
-    setIsFavourite(favourites.includes(event.id));
-  }, [event.id]);
 
   return (
     <div className="event-card" ref={eventCardRef}>
@@ -147,7 +137,6 @@ function EventCard({ event }) {
         <h3>{event.title}</h3>
         <p>{event.date}</p>
 
-        {/* Staff Only - Edit / Delete Buttons */}
         {isStaff && (
           <div
             style={{
@@ -166,7 +155,6 @@ function EventCard({ event }) {
           </div>
         )}
 
-        {/* Normal User Signup */}
         {!isStaff && !showSignup && (
           <button className="signup-btn" onClick={handleSignUpClick}>
             Sign Up
@@ -213,7 +201,6 @@ function EventCard({ event }) {
         )}
       </div>
 
-      {/* Confirmation Modals */}
       {showConfirmation && (
         <div className="confirmation-modal" ref={confirmationModalRef}>
           <p>Are you sure you want to sign up for this event?</p>
