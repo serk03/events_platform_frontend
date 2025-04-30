@@ -1,10 +1,10 @@
-.favourites {
+.favourites-page {
   padding: 2rem;
   width: 100%;
   box-sizing: border-box;
 }
 
-.favourites h2 {
+.favourites-page h2 {
   margin-bottom: 2rem;
   text-align: center;
   font-size: 2.5rem;
@@ -12,6 +12,7 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Empty message container */
 .favourites-empty {
   text-align: center;
   padding: 4rem 2rem;
@@ -33,19 +34,63 @@
   line-height: 1.6;
 }
 
-/* Animation for new favorites being added */
+/* Loading text while fetching */
+.favourites-loading {
+  text-align: center;
+  padding: 3rem 2rem;
+  font-size: 1.5rem;
+  color: #00b894;
+}
+
+/* Grid of favourite event cards */
+.events-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Animate favourite events appearing */
+.events-grid > * {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.toast-message {
+  background-color: #00b894;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  margin: 1rem auto;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  width: fit-content;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  10%,
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.events-grid > * {
-  animation: fadeIn 0.3s ease-out forwards;
 }
