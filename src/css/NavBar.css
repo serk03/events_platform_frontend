@@ -43,6 +43,10 @@
   cursor: pointer;
   object-fit: cover;
   border: 2px solid white;
+  transition: transform 0.2s ease;
+}
+.profile-avatar:hover {
+  transform: scale(1.05);
 }
 
 /* Dropdown Menu */
@@ -78,6 +82,11 @@
 
 .logout-btn {
   width: 100%;
+  color: #ff4d4d;
+}
+
+.logout-btn:hover {
+  background-color: #2a2a2a;
 }
 
 /* Mobile Responsive */
