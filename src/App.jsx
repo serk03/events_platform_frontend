@@ -7,6 +7,7 @@ import StaffRegisterPage from "./pages/StaffRegisterPage";
 import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
 import NavBar from "./components/NavBar";
+import CreateEventPage from "./pages/CreateEventPage";
 import "./css/App.css";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/favourites" element={<FavouritesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/create-event" element={<CreateEventPage />} />
         </Routes>
       </main>
     </div>
