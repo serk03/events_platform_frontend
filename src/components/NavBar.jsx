@@ -53,8 +53,8 @@ function NavBar() {
 
         {isStaff && (
           <>
-            <Link to="/manage-events" className="nav-link">
-              Manage Events
+            <Link to="/create-event" className="nav-link">
+              Create Event
             </Link>
             <Link to="/register-staff" className="nav-link">
               Register Staff
