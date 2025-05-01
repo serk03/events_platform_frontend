@@ -43,14 +43,17 @@ function LoginPage() {
 
       localStorage.setItem("user", JSON.stringify(data.user));
 
+      if (data.token) {
+        localStorage.setItem("staffToken", data.token);
+      }
+
       setSuccess("Login successful! Redirecting...");
-      navigate("/"); // 🚀 Redirect immediately
+      navigate("/"); //
     } catch (err) {
       setError(err.message || "Login error");
     } finally {
       setLoading(false);
     }
-    console.log("API_URL is:", API_URL);
   };
 
   return (
