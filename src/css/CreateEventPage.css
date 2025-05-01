@@ -1,0 +1,83 @@
+.create-event-page {
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.create-event-page h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #00b894;
+}
+
+.create-event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.create-event-form input,
+.create-event-form textarea {
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #2c2c2c;
+  color: white;
+  font-size: 1rem;
+}
+
+.create-event-form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.create-event-form input::placeholder,
+.create-event-form textarea::placeholder {
+  color: #aaa;
+}
+
+.create-event-form button {
+  padding: 0.8rem;
+  background-color: #00b894;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.create-event-form button:hover {
+  background-color: #019875;
+}
+
+.success-message,
+.error-message {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+.success-message {
+  color: #00e676;
+}
+
+.error-message {
+  color: #ff6b6b;
+}
+
+@media (max-width: 600px) {
+  .create-event-page {
+    margin: 2rem 1rem;
+    padding: 1.5rem;
+  }
+
+  .create-event-page h2 {
+    font-size: 1.6rem;
+  }
+}
