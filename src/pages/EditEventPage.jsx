@@ -19,6 +19,7 @@ function EditEventPage() {
 
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchEvent() {
@@ -37,7 +38,7 @@ function EditEventPage() {
           url: event.url || "",
         });
       } catch (err) {
-        setMessage(`❌ ${err.message}`);
+        setError(`❌ ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -56,16 +57,25 @@ function EditEventPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+    setError("");
+    setTimeout(() => setMessage(""), 3000);
 
     try {
       const token = localStorage.getItem("staffToken");
+
       const response = await fetch(`${API_URL}/api/events/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          title: formData.title.trim(),
+          location: formData.location.trim(),
+          description: formData.description.trim(),
+          url: formData.url.trim(),
+        }),
       });
 
       const data = await response.json();
@@ -75,11 +85,16 @@ function EditEventPage() {
       setMessage("✅ Event updated successfully!");
       setTimeout(() => navigate("/"), 2000);
     } catch (err) {
-      setMessage(`❌ ${err.message}`);
+      setError(`❌ ${err.message}`);
     }
   };
 
-  if (loading) return <p>Loading event data...</p>;
+  const handleCancel = () => {
+    navigate("/");
+  };
+
+  if (loading) return <p className="event-message">Loading event data...</p>;
+  if (error) return <p className="event-message error">{error}</p>;
 
   return (
     <div className="edit-event-page">
@@ -90,6 +105,7 @@ function EditEventPage() {
           name="title"
           value={formData.title}
           onChange={handleChange}
+          placeholder="Title"
           required
         />
         <input
@@ -104,6 +120,7 @@ function EditEventPage() {
           name="location"
           value={formData.location}
           onChange={handleChange}
+          placeholder="Location"
           required
         />
         <input
@@ -117,11 +134,25 @@ function EditEventPage() {
           name="description"
           value={formData.description}
           onChange={handleChange}
+          placeholder="Event Description"
           required
         />
-        <button type="submit">Save Changes</button>
+        <div className="edit-buttons">
+          <button type="submit">Save Changes</button>
+          <button type="button" onClick={handleCancel} className="cancel-btn">
+            Cancel
+          </button>
+        </div>
       </form>
-      {message && <p className="event-message">{message}</p>}
+      {message && (
+        <div
+          className={`toast-message ${
+            message.startsWith("✅") ? "success" : "error"
+          }`}
+        >
+          {message}
+        </div>
+      )}
     </div>
   );
 }
