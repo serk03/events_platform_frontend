@@ -250,6 +250,41 @@
   background-color: #c0392b;
 }
 
+.staff-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.edit-btn {
+  background-color: #00b894;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #019875;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .event-card {

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "../css/EventCard.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -18,6 +19,7 @@ function EventCard({ event, onFavouriteToggle }) {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const isStaff = user?.role === "staff";
+  const navigate = useNavigate();
 
   const toggleFavourite = () => {
     const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
@@ -25,7 +27,7 @@ function EventCard({ event, onFavouriteToggle }) {
 
     if (favourites.includes(event.id)) {
       updatedFavourites = favourites.filter((id) => id !== event.id);
-      if (onFavouriteToggle) onFavouriteToggle(event.id); // ✅ Notify parent
+      if (onFavouriteToggle) onFavouriteToggle(event.id);
     } else {
       updatedFavourites = [...favourites, event.id];
     }
@@ -35,17 +37,14 @@ function EventCard({ event, onFavouriteToggle }) {
   };
 
   const handleSignUpClick = () => setShowConfirmation(true);
-
   const confirmSignUp = () => {
     setShowConfirmation(false);
     setShowSignup(true);
   };
-
   const cancelSignUp = () => {
     setShowConfirmation(false);
     setShowCancelConfirmation(true);
   };
-
   const confirmCancel = () => {
     setShowCancelConfirmation(false);
     setShowSignup(false);
@@ -77,22 +76,28 @@ function EventCard({ event, onFavouriteToggle }) {
   };
 
   const handleEditEvent = () => {
-    alert(`Editing event: ${event.title}`);
+    navigate(`/edit-event/${event.id}`);
   };
 
   const handleDeleteEvent = async () => {
+    const token = localStorage.getItem("staffToken");
+
     if (window.confirm("Are you sure you want to delete this event?")) {
       try {
         const response = await fetch(`${API_URL}/api/events/${event.id}`, {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (!response.ok) throw new Error("Failed to delete event");
 
-        alert("Event deleted successfully! (Reload page manually for now)");
-      } catch (error) {
-        console.error(error);
+        alert("Event deleted successfully.");
+        window.location.reload();
+      } catch (err) {
         alert("Error deleting event.");
+        console.error(err);
       }
     }
   };
@@ -137,15 +142,9 @@ function EventCard({ event, onFavouriteToggle }) {
         <h3>{event.title}</h3>
         <p>{event.date}</p>
 
+        {/* Staff controls */}
         {isStaff && (
-          <div
-            style={{
-              marginTop: "10px",
-              display: "flex",
-              gap: "10px",
-              justifyContent: "center",
-            }}
-          >
+          <div className="staff-controls">
             <button onClick={handleEditEvent} className="edit-btn">
               Edit
             </button>
@@ -155,12 +154,14 @@ function EventCard({ event, onFavouriteToggle }) {
           </div>
         )}
 
+        {/* Signup button */}
         {!isStaff && !showSignup && (
           <button className="signup-btn" onClick={handleSignUpClick}>
             Sign Up
           </button>
         )}
 
+        {/* Signup form */}
         {!isStaff && showSignup && (
           <form
             onSubmit={handleSignUp}
@@ -181,7 +182,7 @@ function EventCard({ event, onFavouriteToggle }) {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
+            <div className="signup-actions">
               <button type="submit" className="submit-btn">
                 Submit
               </button>
@@ -201,6 +202,7 @@ function EventCard({ event, onFavouriteToggle }) {
         )}
       </div>
 
+      {/* Modals */}
       {showConfirmation && (
         <div className="confirmation-modal" ref={confirmationModalRef}>
           <p>Are you sure you want to sign up for this event?</p>
