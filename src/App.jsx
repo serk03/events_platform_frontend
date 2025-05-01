@@ -8,6 +8,8 @@ import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
 import NavBar from "./components/NavBar";
 import CreateEventPage from "./pages/CreateEventPage";
+import EditEventPage from "./pages/EditEventPage";
+
 import "./css/App.css";
 
 function App() {
@@ -23,6 +25,7 @@ function App() {
           <Route path="/favourites" element={<FavouritesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/create-event" element={<CreateEventPage />} />
+          <Route path="/edit-event/:id" element={<EditEventPage />} />
         </Routes>
       </main>
     </div>
