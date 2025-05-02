@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../css/EventCard.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -155,10 +155,10 @@ function EventCard({ event, onFavouriteToggle }) {
         )}
 
         {/* Signup button */}
-        {!isStaff && !showSignup && (
-          <button className="signup-btn" onClick={handleSignUpClick}>
-            Sign Up
-          </button>
+        {!isStaff && (
+          <Link to={`/events/${event.id}`} className="signup-btn">
+            Book
+          </Link>
         )}
 
         {/* Signup form */}
