@@ -22,8 +22,7 @@ export async function searchEvents(query) {
     if (!response.ok) {
       throw new Error("Failed to search events");
     }
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error("API Request Failed:", error);
     throw error;
