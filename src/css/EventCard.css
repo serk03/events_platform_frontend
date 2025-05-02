@@ -284,6 +284,44 @@
 .delete-btn:hover {
   background-color: #c0392b;
 }
+.user-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.more-info-btn,
+.signup-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.more-info-btn {
+  background-color: #3498db;
+  color: white;
+}
+
+.more-info-btn:hover {
+  background-color: #2980b9;
+}
+
+.signup-btn {
+  background-color: #00b894;
+  color: white;
+}
+
+.signup-btn:hover {
+  background-color: #019875;
+}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
