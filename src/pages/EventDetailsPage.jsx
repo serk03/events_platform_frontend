@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "../css/EventDetailsPage.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function EventDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [error, setError] = useState("");
 
@@ -39,7 +40,27 @@ function EventDetailsPage() {
         <strong>Location:</strong> {event.location}
       </p>
       <p>{event.description}</p>
-      <button className="book-btn">Book Now</button>
+
+      <div className="button-group">
+        <button
+          className="book-btn"
+          onClick={() => {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (!user) {
+              alert("Please log in to book this event.");
+              navigate("/login");
+            } else {
+              navigate(`/event-confirmation/${event.id}`);
+            }
+          }}
+        >
+          Book Now
+        </button>
+
+        <button className="cancel-btn" onClick={() => navigate("/")}>
+          Cancel
+        </button>
+      </div>
     </div>
   );
 }

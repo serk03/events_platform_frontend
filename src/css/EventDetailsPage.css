@@ -6,36 +6,89 @@
   color: white;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+  text-align: center;
 }
 
 .event-details h2 {
   color: #00b894;
   margin-bottom: 1rem;
+  font-size: 2rem;
 }
 
 .event-details p {
   margin-bottom: 1rem;
   line-height: 1.6;
+  font-size: 1.05rem;
+  color: #ccc;
 }
 
 .event-image {
   width: 100%;
   height: auto;
   border-radius: 8px;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  max-height: 400px;
+  object-fit: cover;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
 }
 
 .book-btn {
   padding: 0.75rem 1.5rem;
-  background-color: #e50914;
+  background-color: #00b894;
   color: white;
   border: none;
   border-radius: 6px;
   font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .book-btn:hover {
-  background-color: #f40612;
+  background-color: #019875;
+}
+
+.cancel-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #636e72;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background-color: #4b5356;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .event-details {
+    padding: 1.5rem;
+    margin: 2rem 1rem;
+  }
+
+  .event-details h2 {
+    font-size: 1.5rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .book-btn,
+  .cancel-btn {
+    width: 100%;
+  }
 }
