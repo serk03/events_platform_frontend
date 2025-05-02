@@ -7,7 +7,7 @@ const DEFAULT_AVATAR = "https://placehold.co/40x40";
 
 function NavBar() {
   const user = JSON.parse(localStorage.getItem("user"));
-  const isStaff = user && user.role === "staff";
+  const isStaff = user?.role === "staff";
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -20,7 +20,6 @@ function NavBar() {
     navigate("/login");
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function onClickOutside(e) {
       if (
@@ -40,16 +39,19 @@ function NavBar() {
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <Link to="/">Event App</Link>
+        <Link to="/">Event-US</Link>
       </div>
 
       <div className="navbar-links">
         <Link to="/" className="nav-link">
           Home
         </Link>
-        <Link to="/favourites" className="nav-link">
-          Favourites
-        </Link>
+
+        {user && (
+          <Link to="/favourites" className="nav-link">
+            Favourites
+          </Link>
+        )}
 
         {isStaff && (
           <>
@@ -62,7 +64,18 @@ function NavBar() {
           </>
         )}
 
-        {user && (
+        {!user ? (
+          <div className="auth-buttons">
+            <Link to="/login" className="auth-link login">
+              Login
+            </Link>
+            <Link to="/register" className="auth-link signup">
+              Sign Up
+            </Link>
+          </div>
+        ) : (
+          // ...
+
           <div className="profile-dropdown">
             <img
               ref={avatarRef}
@@ -71,7 +84,6 @@ function NavBar() {
               className="profile-avatar"
               onClick={() => setDropdownOpen((open) => !open)}
             />
-
             {dropdownOpen && (
               <div className="dropdown-menu" ref={dropdownRef}>
                 <Link
