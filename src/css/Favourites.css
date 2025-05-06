@@ -1,6 +1,7 @@
 .favourites-page {
   padding: 2rem;
-  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   box-sizing: border-box;
 }
 
@@ -12,7 +13,6 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Empty message container */
 .favourites-empty {
   text-align: center;
   padding: 4rem 2rem;
@@ -34,7 +34,6 @@
   line-height: 1.6;
 }
 
-/* Loading text while fetching */
 .favourites-loading {
   text-align: center;
   padding: 3rem 2rem;
@@ -42,16 +41,15 @@
   color: #00b894;
 }
 
-/* Grid of favourite event cards */
 .events-grid {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: flex-start;
   gap: 2rem;
-  margin-top: 2rem;
+  padding: 1rem;
 }
 
-/* Animate favourite events appearing */
 .events-grid > * {
   animation: fadeIn 0.3s ease-out forwards;
 }
@@ -66,6 +64,39 @@
   border-radius: 8px;
   width: fit-content;
   animation: fadeInOut 3s ease-in-out;
+}
+
+.sort-label {
+  color: black;
+}
+
+.sort-dropdown {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #919190;
+  color: #fff;
+}
+
+/* Optional: Spinner for loading */
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #00b894;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 1s linear infinite;
+}
+
+.icon-advise {
+  color: black;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeInOut {
