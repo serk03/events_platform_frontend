@@ -1,62 +1,104 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { doc, deleteDoc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
 import "../css/EventCard.css";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-function EventCard({ event, onFavouriteToggle }) {
+function EventCard({ event, onFavouriteToggle, hideBookButton = false }) {
   const [isFavourite, setIsFavourite] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
   const isStaff = user?.role === "staff";
   const navigate = useNavigate();
 
-  const toggleFavourite = () => {
+  const toggleFavourite = async () => {
     if (!user) {
       alert("Please log in to use favourites.");
       navigate("/login");
       return;
     }
 
-    const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
-    const updated = favourites.includes(event.id)
-      ? favourites.filter((id) => id !== event.id)
-      : [...favourites, event.id];
+    const favRef = doc(db, "users", user.uid, "favourites", event.id);
 
-    localStorage.setItem("favourites", JSON.stringify(updated));
-    setIsFavourite(updated.includes(event.id));
-    if (onFavouriteToggle) onFavouriteToggle(event.id);
+    try {
+      const favSnap = await getDoc(favRef);
+
+      if (favSnap.exists()) {
+        await deleteDoc(favRef);
+        setIsFavourite(false);
+        if (onFavouriteToggle) onFavouriteToggle(event.id);
+      } else {
+        await setDoc(favRef, {
+          eventId: event.id,
+          timestamp: new Date().toISOString(),
+        });
+        setIsFavourite(true);
+        if (onFavouriteToggle) onFavouriteToggle(event.id);
+      }
+    } catch (err) {
+      console.error("Failed to toggle favourite:", err);
+      alert("❌ Failed to update favourite.");
+    }
   };
 
   const handleEditEvent = () => navigate(`/edit-event/${event.id}`);
 
   const handleDeleteEvent = async () => {
-    const token = localStorage.getItem("staffToken");
-    if (!window.confirm("Are you sure you want to delete this event?")) return;
+    if (!isStaff) {
+      alert("You are not authorized to delete events.");
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this event?"
+    );
+    if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/events/${event.id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error("Failed to delete event");
-      alert("Event deleted successfully.");
+      await deleteDoc(doc(db, "events", event.id));
+      alert("✅ Event deleted successfully.");
       window.location.reload();
     } catch (err) {
-      alert("Error deleting event.");
-      console.error(err);
+      console.error("Error deleting event:", err);
+      alert("❌ Failed to delete event.");
     }
   };
 
   useEffect(() => {
-    const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
-    setIsFavourite(favourites.includes(event.id));
-  }, [event.id]);
+    if (!user || !user.uid) return;
+
+    const checkFavourite = async () => {
+      try {
+        const favRef = doc(db, "users", user.uid, "favourites", event.id);
+        const favSnap = await getDoc(favRef);
+        setIsFavourite(favSnap.exists());
+      } catch (err) {
+        console.error("Error checking favourite:", err);
+      }
+    };
+
+    checkFavourite();
+  }, [event.id, user]);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  };
 
   return (
     <div className="event-card">
       <div className="event-poster">
-        <img src={event.url} alt={event.title} />
+        <img
+          src={event.url || "/images/Event-US-Default.png"}
+          alt={event.title}
+          onError={(e) => {
+            e.currentTarget.src = "/images/Event-US-Default.png";
+          }}
+        />
         <div className="event-overlay">
           {user && (
             <button className="favourite-btn" onClick={toggleFavourite}>
@@ -68,7 +110,7 @@ function EventCard({ event, onFavouriteToggle }) {
 
       <div className="event-info">
         <h3>{event.title}</h3>
-        <p>{event.date}</p>
+        <p>{formatDate(event.date)}</p>
 
         {isStaff ? (
           <div className="staff-controls">
@@ -84,19 +126,21 @@ function EventCard({ event, onFavouriteToggle }) {
             <Link to={`/events/${event.id}`} className="more-info-btn">
               More Info
             </Link>
-            <button
-              className="signup-btn"
-              onClick={() => {
-                if (!user) {
-                  alert("Please log in to book this event.");
-                  navigate("/login");
-                } else {
-                  navigate(`/book-event/${event.id}`);
-                }
-              }}
-            >
-              Book Event
-            </button>
+            {!hideBookButton && (
+              <button
+                className="signup-btn"
+                onClick={() => {
+                  if (!user) {
+                    alert("Please log in to book this event.");
+                    navigate("/login");
+                  } else {
+                    navigate(`/book-event/${event.id}`);
+                  }
+                }}
+              >
+                Book Event
+              </button>
+            )}
           </div>
         )}
       </div>
