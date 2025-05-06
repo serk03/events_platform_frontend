@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  updateProfile,
+  updatePassword,
+  deleteUser,
+  onAuthStateChanged,
+} from "firebase/auth";
+import { doc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 import "../css/ProfilePage.css";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -20,17 +26,21 @@ function ProfilePage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
-      setFormData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        profilePicture: user.profilePicture || "",
-        password: "",
-        confirmPassword: "",
-      });
-    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const [firstName = "", lastName = ""] =
+          user.displayName?.split(" ") || [];
+        setFormData({
+          firstName,
+          lastName,
+          email: user.email,
+          profilePicture: user.photoURL || "",
+          password: "",
+          confirmPassword: "",
+        });
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   const handleChange = (e) => {
@@ -42,41 +52,47 @@ function ProfilePage() {
     setSuccess("");
     setError("");
 
-    if (formData.password && formData.password !== formData.confirmPassword) {
+    const { firstName, lastName, profilePicture, password, confirmPassword } =
+      formData;
+
+    if (password && password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const response = await fetch(`${API_URL}/api/users/${user.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          profilePicture: formData.profilePicture,
-          password: formData.password || undefined,
-        }),
-      });
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, {
+          displayName: `${firstName} ${lastName}`,
+          photoURL: profilePicture || null,
+        });
 
-      const data = await response.json();
+        if (password) {
+          await updatePassword(auth.currentUser, password);
+        }
 
-      if (!response.ok) {
-        throw new Error(data.message || "Update failed");
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        await updateDoc(userRef, {
+          firstName,
+          lastName,
+          profilePicture: profilePicture || "",
+        });
+
+        const updatedUser = {
+          email: auth.currentUser.email,
+          profilePicture: auth.currentUser.photoURL,
+          fullName: auth.currentUser.displayName,
+          role: JSON.parse(localStorage.getItem("user"))?.role || "user",
+        };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        window.dispatchEvent(new Event("storage"));
+
+        setSuccess("Profile updated successfully");
+        setFormData((prev) => ({ ...prev, password: "", confirmPassword: "" }));
       }
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ ...user, ...data.updatedUser })
-      );
-
-      setSuccess("Profile updated successfully");
-      setFormData((prev) => ({ ...prev, password: "", confirmPassword: "" }));
     } catch (err) {
-      setError(err.message);
+      setError("Failed to update profile");
+      console.error(err);
     }
   };
 
@@ -89,21 +105,15 @@ function ProfilePage() {
       return;
 
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-
-      const response = await fetch(`${API_URL}/api/users/${user.id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete account");
+      if (auth.currentUser) {
+        await deleteUser(auth.currentUser);
+        localStorage.removeItem("user");
+        localStorage.removeItem("favourites");
+        navigate("/login");
       }
-
-      localStorage.removeItem("user");
-      localStorage.removeItem("favourites");
-      navigate("/login");
     } catch (err) {
       setError("Error deleting account");
+      console.error(err);
     }
   };
 
@@ -111,6 +121,17 @@ function ProfilePage() {
     <div className="profile-page">
       <h2>Your Profile</h2>
       <form className="profile-form" onSubmit={handleSubmit}>
+        <div className="profile-picture-preview">
+          <img
+            src={formData.profilePicture || "https://placehold.co/100x100"}
+            alt="Current Profile"
+            className="profile-picture"
+            onError={(e) => {
+              e.currentTarget.src = "https://placehold.co/100x100";
+            }}
+          />
+        </div>
+
         <input
           type="text"
           name="firstName"
