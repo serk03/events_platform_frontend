@@ -1,8 +1,9 @@
 .create-event-page {
-  max-width: 600px;
-  margin: 3rem auto;
+  width: 80vw; /* fluid width */
+  max-width: 600px; /* cap at 600px */
+  margin: 2rem auto; /* less vertical margin */
   padding: 2rem;
-  background-color: #1a1a1a;
+  background-color: #919190;
   border-radius: 12px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   color: white;
@@ -10,7 +11,7 @@
 
 .create-event-page h2 {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem; /* tighten space below heading */
   font-size: 2rem;
   color: #00b894;
 }
@@ -18,7 +19,7 @@
 .create-event-form {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1rem; /* slightly less gap */
 }
 
 .create-event-form input,
@@ -26,8 +27,8 @@
   padding: 0.75rem;
   border-radius: 6px;
   border: 1px solid #ccc;
-  background-color: #2c2c2c;
-  color: white;
+  background-color: #fff; /* fixed typo: #ffff → #fff */
+  color: black;
   font-size: 1rem;
 }
 
@@ -73,7 +74,7 @@
 
 @media (max-width: 600px) {
   .create-event-page {
-    margin: 2rem 1rem;
+    margin: 1.5rem 1rem;
     padding: 1.5rem;
   }
 

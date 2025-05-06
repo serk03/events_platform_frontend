@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase";
 import "../css/CreateEventPage.css";
 
 function CreateEventPage() {
@@ -26,20 +28,12 @@ function CreateEventPage() {
     setLoading(true);
 
     try {
-      const token = `Bearer ${localStorage.getItem("staffToken")}`;
-      const response = await fetch("http://localhost:5000/api/events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
-        body: JSON.stringify(formData),
-      });
+      const newEvent = {
+        ...formData,
+        createdAt: serverTimestamp(),
+      };
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to create event");
-      }
+      await addDoc(collection(db, "events"), newEvent);
 
       setMessage("✅ Event created successfully!");
       setFormData({
@@ -50,10 +44,10 @@ function CreateEventPage() {
         url: "",
       });
 
-      // Auto-clear message
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      setMessage(`❌ ${err.message}`);
+      console.error("Error creating event:", err);
+      setMessage(`❌ Failed to create event.`);
     } finally {
       setLoading(false);
     }
