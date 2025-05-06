@@ -1,5 +1,5 @@
 .navbar {
-  background-color: #000000;
+  background-color: #919190;
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -8,8 +8,13 @@
 }
 
 .navbar-brand {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
+  color: #ffff;
+}
+.navbar-brand a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .navbar-links {
@@ -22,31 +27,54 @@
   font-size: 1rem;
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   color: white;
   text-decoration: none;
+  border: 1px solid transparent;
 }
 
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #eaeaea;
+  color: #00b894;
+  border-color: #ffff;
 }
 
-/* Profile Avatar */
+/* Profile Dropdown Container */
 .profile-dropdown {
   position: relative;
 }
 
+/* Profile Info (Avatar + Role) */
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+/* Profile Avatar */
 .profile-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  cursor: pointer;
   object-fit: cover;
   border: 2px solid white;
   transition: transform 0.2s ease;
 }
+
 .profile-avatar:hover {
   transform: scale(1.05);
+}
+
+/* User Role Label */
+.user-role-label {
+  background-color: #00b894;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
 /* Dropdown Menu */
@@ -64,30 +92,55 @@
   min-width: 150px;
 }
 
+/* Dropdown Header */
+.dropdown-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #333;
+  font-size: 1rem;
+  color: #ccc;
+  background-color: #919190;
+}
+
+/* Dropdown Items */
 .dropdown-item {
   padding: 0.75rem 1rem;
   color: white;
   text-decoration: none;
   font-size: 0.95rem;
-  background-color: #1a1a1a;
-  border: none;
+  background-color: #919190;
+  border: 1px solid transparent;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease;
 }
 
+/* Hover state */
 .dropdown-item:hover {
-  background-color: #333333;
+  background-color: #eaeaea;
+  color: #00b894;
+  border-color: #00b894;
 }
 
 .logout-btn {
   width: 100%;
-  color: #ff4d4d;
+  padding: 0.75rem 1rem;
+  background-color: #919190;
+  color: white;
+  border: 1px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease;
 }
 
+/* Hover state */
 .logout-btn:hover {
-  background-color: #2a2a2a;
+  background-color: #eaeaea;
+  color: red;
+  border-color: #00b894;
 }
+
 /* Auth Buttons for Login / Sign Up */
 .auth-buttons {
   display: flex;
