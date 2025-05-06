@@ -1,8 +1,10 @@
-import { useState } from "react";
+// src/pages/StaffRegisterPage.jsx
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "../css/UserRegisterPage.css";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
+import "../css/UserRegisterPage.css"; // shared styles including .input-wrapper
 
 function StaffRegisterPage() {
   const navigate = useNavigate();
@@ -12,53 +14,72 @@ function StaffRegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    staffToken: "",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      setError("You must be logged in as staff to register other staff.");
+      setCheckingAccess(false);
+      return;
+    }
+    (async () => {
+      try {
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        if (userDoc.data()?.role === "staff") {
+          setIsAuthorized(true);
+        } else {
+          setError("Only staff members can register new staff.");
+        }
+      } catch {
+        setError("Error verifying access.");
+      } finally {
+        setCheckingAccess(false);
+      }
+    })();
+  }, []);
+
+  const handleChange = (e) =>
+    setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
-    if (formData.password !== formData.confirmPassword) {
+    const { firstName, lastName, email, password, confirmPassword } = formData;
+    if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
     try {
-      const response = await fetch(`${API_URL}/api/auth/register-staff`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: formData.staffToken,
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-        }),
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(cred.user, {
+        displayName: `${firstName} ${lastName}`,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Staff registration failed");
-      }
-
-      setSuccess("Staff registered successfully! Redirecting to login...");
+      await setDoc(doc(db, "users", cred.user.uid), {
+        firstName,
+        lastName,
+        email,
+        role: "staff",
+        profilePicture: "",
+      });
+      setSuccess("Staff registered successfully!");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
-      setError(err.message);
+      console.error(err);
+      setError(err.message || "Staff registration failed");
     }
   };
+
+  if (checkingAccess)
+    return <p className="loading-message">Checking staff access...</p>;
+  if (!isAuthorized) return <p className="error-message">{error}</p>;
 
   return (
     <div className="register-page">
@@ -88,30 +109,42 @@ function StaffRegisterPage() {
           onChange={handleChange}
           required
         />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm Password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="staffToken"
-          placeholder="Staff Token"
-          value={formData.staffToken}
-          onChange={handleChange}
-          required
-        />
+
+        {/* Password Field */}
+        <div className="input-wrapper">
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <span
+            className="input-icon"
+            onClick={() => setShowPassword((v) => !v)}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
+
+        {/* Confirm Password Field */}
+        <div className="input-wrapper">
+          <input
+            type={showConfirm ? "text" : "password"}
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+          <span
+            className="input-icon"
+            onClick={() => setShowConfirm((v) => !v)}
+          >
+            {showConfirm ? "🙈" : "👁️"}
+          </span>
+        </div>
 
         <button type="submit" className="register-btn">
           Register Staff
