@@ -1,108 +1,76 @@
 import EventCard from "../components/EventCard";
 import { useState, useEffect } from "react";
-import { searchEvents, getPopularEvents } from "../services/api";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 import "../css/Home.css";
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [events, setEvents] = useState([]);
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
 
   useEffect(() => {
-    loadPopularEvents();
+    async function fetchEvents() {
+      setLoading(true);
+      try {
+        const snapshot = await getDocs(collection(db, "events"));
+        const eventsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setEvents(eventsData);
+      } catch (err) {
+        console.error("Failed to fetch events:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchEvents();
   }, []);
 
-  const loadPopularEvents = async () => {
-    try {
-      setLoading(true);
-      const popularEvents = await getPopularEvents();
-      setEvents(popularEvents);
-    } catch (error) {
-      console.error(error);
-      setError("Failed to load events.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
-    if (!searchQuery.trim() && !searchLocation.trim()) return;
-
-    try {
-      setLoading(true);
-      const results = await searchEvents(searchQuery);
-      const filtered = results.filter((event) =>
-        searchLocation
-          ? event.location.toLowerCase().includes(searchLocation.toLowerCase())
-          : true
-      );
-      setEvents(filtered);
-      setError(filtered.length === 0 ? "No events match your search." : "");
-    } catch (err) {
-      console.error(err);
-      setError("Failed to search events.");
-    } finally {
-      setLoading(false);
-    }
+    // You could trigger a backend search here if using a search index.
   };
 
-  const handleResetSearch = async () => {
-    try {
-      setLoading(true);
-      await loadPopularEvents();
-      setSearchQuery("");
-      setSearchLocation("");
-      setError("");
-    } catch {
-      setError("Failed to reset search.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleClearFilters = () => {
-    setSelectedLocation("");
-    setSelectedDate("");
-    setSortOrder("newest");
-  };
-
-  const sortEvents = (events) => {
-    return [...events].sort((a, b) => {
+  const filteredEvents = events
+    .filter((event) =>
+      searchQuery
+        ? event.title.toLowerCase().includes(searchQuery.toLowerCase())
+        : true
+    )
+    .filter((event) =>
+      searchLocation
+        ? event.location.toLowerCase().includes(searchLocation.toLowerCase())
+        : true
+    )
+    .filter((event) =>
+      selectedLocation
+        ? event.location.toLowerCase() === selectedLocation.toLowerCase()
+        : true
+    )
+    .filter((event) => (selectedDate ? event.date === selectedDate : true))
+    .sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
-      const titleA = a.title.toLowerCase();
-      const titleB = b.title.toLowerCase();
-
       switch (sortOrder) {
         case "newest":
           return dateB - dateA;
         case "oldest":
           return dateA - dateB;
         case "title-asc":
-          return titleA.localeCompare(titleB);
+          return a.title.localeCompare(b.title);
         case "title-desc":
-          return titleB.localeCompare(titleA);
+          return b.title.localeCompare(a.title);
         default:
           return 0;
       }
     });
-  };
-
-  const filteredEvents = sortEvents(
-    events
-      .filter((event) =>
-        selectedLocation
-          ? event.location.toLowerCase() === selectedLocation.toLowerCase()
-          : true
-      )
-      .filter((event) => (selectedDate ? event.date === selectedDate : true))
-  );
 
   return (
     <div className="home">
@@ -149,29 +117,39 @@ function HomePage() {
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value)}
         >
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-          <option value="title-asc">Title A-Z</option>
-          <option value="title-desc">Title Z-A</option>
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="title-asc">Title A–Z</option>
+          <option value="title-desc">Title Z–A</option>
         </select>
       </div>
 
       <div className="action-buttons">
-        <button className="clear-filters" onClick={handleClearFilters}>
-          Clear Filters
-        </button>
-        <button className="clear-filters" onClick={handleResetSearch}>
-          Reset Search
+        <button
+          className="clear-filters"
+          onClick={() => {
+            setSelectedLocation("");
+            setSelectedDate("");
+            setSearchQuery("");
+            setSearchLocation("");
+            setSortOrder("newest");
+          }}
+        >
+          Reset All
         </button>
       </div>
 
-      {error && <div className="toast-message error-toast">{error}</div>}
-
-      <div className="events-grid">
-        {filteredEvents.map((event) => (
-          <EventCard event={event} key={event.id} />
-        ))}
-      </div>
+      {loading ? (
+        <p>Loading events...</p>
+      ) : filteredEvents.length === 0 ? (
+        <p className="no-results">No events found.</p>
+      ) : (
+        <div className="events-grid">
+          {filteredEvents.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
