@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 import "../css/LoginPage.css";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ function LoginPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -25,32 +27,35 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
 
-      const data = await response.json();
+      const firebaseUser = userCredential.user;
+      const userDocRef = doc(db, "users", firebaseUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
 
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+      let role = "user";
+      if (userDocSnap.exists()) {
+        role = userDocSnap.data().role || "user";
       }
 
-      if (!data.user) {
-        throw new Error("User data not found!");
-      }
+      const user = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        fullName: firebaseUser.displayName || "",
+        profilePicture: firebaseUser.photoURL || "",
+        role,
+      };
 
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      if (data.token) {
-        localStorage.setItem("staffToken", data.token);
-      }
-
-      setSuccess("Login successful! Redirecting...");
-      navigate("/"); //
+      localStorage.setItem("user", JSON.stringify(user));
+      setSuccess("✅ Login successful! Redirecting...");
+      navigate("/");
     } catch (err) {
-      setError(err.message || "Login error");
+      console.error(err);
+      setError("❌ Invalid email or password.");
     } finally {
       setLoading(false);
     }
@@ -68,14 +73,23 @@ function LoginPage() {
           onChange={handleChange}
           required
         />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
+        <div className="input-wrapper">
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <span
+            className="input-icon"
+            onClick={() => setShowPassword((prev) => !prev)}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
+
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
@@ -84,7 +98,6 @@ function LoginPage() {
       {error && <p className="error-message">{error}</p>}
       {success && <p className="success-message">{success}</p>}
 
-      {/* ✅ Navigation Links at bottom */}
       <div className="auth-links">
         <p>
           <Link to="/">← Back to Home</Link>
