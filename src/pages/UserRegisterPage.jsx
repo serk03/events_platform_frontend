@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 import "../css/UserRegisterPage.css";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-function RegisterPage() {
+function UserRegisterPage() {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -12,9 +13,11 @@ function RegisterPage() {
     password: "",
     confirmPassword: "",
   });
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -29,38 +32,48 @@ function RegisterPage() {
     setError("");
     setSuccess("");
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
+    const { firstName, lastName, email, password, confirmPassword } = formData;
+
+    if (password !== confirmPassword) {
+      setError("❌ Passwords do not match.");
       return;
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      await updateProfile(userCredential.user, {
+        displayName: `${firstName} ${lastName}`,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
-
-      setSuccess("Registration successful! Redirecting to login...");
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        firstName,
+        lastName,
+        email,
+        role: "user",
+        profilePicture: "",
       });
+
+      const user = {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        fullName: `${firstName} ${lastName}`,
+        role: "user",
+      };
+
+      localStorage.setItem("user", JSON.stringify(user));
+      setSuccess("✅ Registration successful! Redirecting...");
 
       setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 1500);
     } catch (err) {
-      setError(err.message);
+      console.error(err);
+      setError(err.message || "❌ Registration failed.");
     }
   };
 
@@ -104,22 +117,40 @@ function RegisterPage() {
           onChange={handleChange}
           required
         />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm Password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          required
-        />
+
+        <div className="input-wrapper">
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <span
+            className="input-icon"
+            onClick={() => setShowPassword((prev) => !prev)}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
+
+        <div className="input-wrapper">
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+          <span
+            className="input-icon"
+            onClick={() => setShowConfirmPassword((prev) => !prev)}
+          >
+            {showConfirmPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
 
         <div className="register-form-buttons">
           <button type="submit" className="register-btn">
@@ -134,7 +165,6 @@ function RegisterPage() {
       {error && <p className="error-message">{error}</p>}
       {success && <p className="success-message">{success}</p>}
 
-      {/* ✅ Navigation links at bottom */}
       <div className="auth-links">
         <p>
           <Link to="/">← Back to Home</Link>
@@ -147,4 +177,4 @@ function RegisterPage() {
   );
 }
 
-export default RegisterPage;
+export default UserRegisterPage;
