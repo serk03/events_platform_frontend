@@ -114,3 +114,12 @@ Supports user authentication (email/password), role-based access (user vs. staff
 - src/main.jsx # Entry point
 
 ## 💻Deployment
+
+- Live site can be found here: https://event-platform-78e32.web.app/
+
+## 🔐Staff/Admin User Access
+
+```bash
+username: admin@example.com
+password: Admin1
+```
